@@ -22,6 +22,7 @@ The automated leave form aims to solve the manual and tideous work of taking the
 # Working
 
 ![image](./images/VTAPP.png)
+![detailed](./images/schema_bg.png)
 
 # Intended Use
 1. Student requests for leave
