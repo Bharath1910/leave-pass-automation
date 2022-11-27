@@ -1,10 +1,6 @@
 from dotenv import  load_dotenv, find_dotenv # To load environment variables
 from pymongo import MongoClient # MongoDB API
-import RPi.GPIO as gpio # To access GPIO pins on raspberry pi
 import os, datetime 
-
-# Setting up GPIO in raspberry pi
-gpio.setmode(gpio.BOARD)
 
 # Loading the environment variables
 load_dotenv(find_dotenv())
@@ -12,13 +8,34 @@ load_dotenv(find_dotenv())
 dbUsr = os.environ.get("MONGODB_USR")
 dbPwd = os.environ.get("MONGODB_PWD")
 
-# Connecting to the database
-connectionString = f"mongodb+srv://{dbUsr}:{dbPwd}@cluster0.w25vf.mongodb.net/?retryWrites=true&w=majority"
-client = MongoClient(connectionString)
-
 # Getting the database
-db = client.leavePass
-approvedCollection = db.approved
+# db = client.leavePass
+# approvedCollection = db.approved
+
+class Fetch:
+    def __init__(self, regNo):
+        client = MongoClient(f"mongodb+srv://{dbUsr}:{dbPwd}@cluster0.w25vf.mongodb.net/?retryWrites=true&w=majority").leavePass.approved
+        self.data = client.find_one({"regNo": regNo})
+    
+    def out(self):
+        return self.data
+    
+    def isScanned(self):
+        try:
+            self.data["lastScanned"]
+            return True
+        
+        except KeyError:
+            return False
+
+
+approvedDB = Fetch("22BEC7194")
+
+print(approvedDB.isScanned())
+
+
+
+
 
 def isScanned(collection, regNo):
     scn = collection.find_one({"regNo": f"{regNo}","lastScanned": {"$exists": True}})
@@ -57,30 +74,17 @@ def isLate(regNo, collection):
     elif delDate.days < 0:
         return True
 
+# data = rfidData(2)
+# document = approvedCollection.find_one({"regNo": data})
 
+# dbData = isScanned(approvedCollection ,data)
+# if dbData:
+#     print(f"Welcome Home {data} \nyou were on leave for: {daysLeft(dbData['lastScanned'])} days\nAre you late?: {isLate(data, approvedCollection)}")
 
-gpio.setup(8, gpio.IN)
-print("starting")
-while True:
-    try:
-        if gpio.input(8):
-            data = rfidData(2)
-            dbData = isScanned(approvedCollection ,data)
-            if dbData:
-                print(f"Welcome Home {data} \nyou were on leave for: {daysLeft(dbData['lastScanned'])} days\nAre you late?: {isLate(data, approvedCollection)}")
-            
-            else:
-                curTime = datetime.datetime.now()
-                updateStr = {
-                    "$set": {"lastScanned": curTime}
-                }
-
-                approvedCollection.update_one({"regNo": data}, updateStr)
-                print("Happy Journey")
-        
-        else:
-            pass
-    
-    except KeyboardInterrupt:
-        print("Terminating!")
-        break
+# else:
+#     curTime = datetime.datetime.now()
+#     updateStr = {
+#         "$set": {"lastScanned": curTime}
+#     }
+#     approvedCollection.update_one({"regNo": data}, updateStr)
+#     print("Happy Journey")
