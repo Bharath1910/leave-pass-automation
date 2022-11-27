@@ -14,7 +14,8 @@ dbPwd = os.environ.get("MONGODB_PWD")
 
 class Fetch:
     def __init__(self, regNo):
-        client = MongoClient(f"mongodb+srv://{dbUsr}:{dbPwd}@cluster0.w25vf.mongodb.net/?retryWrites=true&w=majority").leavePass.approved
+        self.regNo = regNo
+        self.client = MongoClient(f"mongodb+srv://{dbUsr}:{dbPwd}@cluster0.w25vf.mongodb.net/?retryWrites=true&w=majority").leavePass.approved
         self.data = client.find_one({"regNo": regNo})
     
     def out(self):
@@ -28,22 +29,24 @@ class Fetch:
         except KeyError:
             return False
 
+    def update(self):
+        curTime = datetime.datetime.now()
+
+        updateString = {
+            "$set": {
+                "lastScanned": curTime
+            }
+        }
+
+        self.client.update_one({"regNo": self.regNo}, updateString)
+
+    
+
 
 approvedDB = Fetch("22BEC7194")
 
 print(approvedDB.isScanned())
 
-
-
-
-
-def isScanned(collection, regNo):
-    scn = collection.find_one({"regNo": f"{regNo}","lastScanned": {"$exists": True}})
-    
-    if scn == None:
-        return False
-    
-    return scn
 
 def rfidData(temp):
     if temp == 1:
