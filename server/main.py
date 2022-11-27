@@ -1,6 +1,7 @@
-from dotenv import  load_dotenv, find_dotenv
-from pymongo import MongoClient
-import os, pprint
+from dotenv import  load_dotenv, find_dotenv # To load environment variables
+from RPi.GPIO import GPIO as gpio # To access GPIO pins on raspberry pi
+from pymongo import MongoClient # MongoDB API
+import os # To access environment variables
 
 load_dotenv(find_dotenv())
 
@@ -23,4 +24,14 @@ def isScanned(collection, regNo):
         return False
     
     return True
+
+def rfidData(temp):
+    if temp == 1:
+        return "22BEC7194"
+    
+    elif temp == 2:
+        return "21BCE7194"
+    
+    else:
+        return "19BCE1234"
 
