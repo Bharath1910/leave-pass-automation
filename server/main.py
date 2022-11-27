@@ -15,3 +15,12 @@ client = MongoClient(connectionString)
 # Getting the database
 db = client.leavePass
 approvedCollection = db.approved
+
+def isScanned(collection, regNo):
+    scn = collection.find_one({"regNo": f"{regNo}","lastScanned": {"$exists": True}})
+    
+    if scn == None:
+        return False
+    
+    return True
+
