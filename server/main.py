@@ -1,11 +1,14 @@
 from dotenv import  load_dotenv, find_dotenv # To load environment variables
-from RPi.GPIO import GPIO as gpio # To access GPIO pins on raspberry pi
 from pymongo import MongoClient # MongoDB API
+import RPi.GPIO as gpio # To access GPIO pins on raspberry pi
 import os # To access environment variables
 
-load_dotenv(find_dotenv())
+# Setting up GPIO in raspberry pi
+gpio.setmode(gpio.BOARD)
 
 # Loading the environment variables
+load_dotenv(find_dotenv())
+
 dbUsr = os.environ.get("MONGODB_USR")
 dbPwd = os.environ.get("MONGODB_PWD")
 
@@ -23,7 +26,7 @@ def isScanned(collection, regNo):
     if scn == None:
         return False
     
-    return True
+    return scn
 
 def rfidData(temp):
     if temp == 1:
@@ -35,3 +38,22 @@ def rfidData(temp):
     else:
         return "19BCE1234"
 
+gpio.setup(8, gpio.IN)
+print("starting")
+while True:
+    try:
+        if gpio.input(8):
+            data = rfidData(1)
+            dbData = isScanned(approvedCollection ,data)
+            if dbData:
+                print(f"Welcome Home {data} \nyou left the campus on: {dbData['lastScanned']}")
+            
+            else:
+                print("Happy Journey")
+        
+        else:
+            pass
+    
+    except KeyboardInterrupt:
+        print("Terminating!")
+        break
