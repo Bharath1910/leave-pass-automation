@@ -1,6 +1,6 @@
 from dotenv import  load_dotenv, find_dotenv # To load environment variables
 from pymongo import MongoClient # MongoDB API
-import os, datetime 
+import os, datetime
 
 # Loading the environment variables
 load_dotenv(find_dotenv())
@@ -8,13 +8,10 @@ load_dotenv(find_dotenv())
 dbUsr = os.environ.get("MONGODB_USR")
 dbPwd = os.environ.get("MONGODB_PWD")
 
-# Getting the database
-# db = client.leavePass
-# approvedCollection = db.approved
-
 class Fetch:
     def __init__(self, regNo):
         self.regNo = regNo
+        self.curTime = datetime.datetime.now()
         self.client = MongoClient(f"mongodb+srv://{dbUsr}:{dbPwd}@cluster0.w25vf.mongodb.net/?retryWrites=true&w=majority").leavePass.approved
         self.data = client.find_one({"regNo": regNo})
     
@@ -30,7 +27,6 @@ class Fetch:
             return False
 
     def update(self):
-        curTime = datetime.datetime.now()
 
         updateString = {
             "$set": {
@@ -39,8 +35,13 @@ class Fetch:
         }
 
         self.client.update_one({"regNo": self.regNo}, updateString)
-
     
+    def isLate(self):
+        returnDate = self.data["toDate"]
+        curDate = self.curtime
+
+        return retrunDate < curDate
+        
 
 
 approvedDB = Fetch("22BEC7194")
@@ -85,9 +86,4 @@ def isLate(regNo, collection):
 #     print(f"Welcome Home {data} \nyou were on leave for: {daysLeft(dbData['lastScanned'])} days\nAre you late?: {isLate(data, approvedCollection)}")
 
 # else:
-#     curTime = datetime.datetime.now()
-#     updateStr = {
-#         "$set": {"lastScanned": curTime}
-#     }
-#     approvedCollection.update_one({"regNo": data}, updateStr)
 #     print("Happy Journey")
