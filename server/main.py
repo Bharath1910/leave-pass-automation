@@ -1,24 +1,34 @@
-from dotenv import  load_dotenv, find_dotenv # To load environment variables
-from pymongo import MongoClient # MongoDB API
+from dotenv import  load_dotenv, find_dotenv 
+from pymongo import MongoClient
 import os, datetime
 
 # Loading the environment variables
 load_dotenv(find_dotenv())
-
 dbUsr = os.environ.get("MONGODB_USR")
 dbPwd = os.environ.get("MONGODB_PWD")
 
 class Fetch:
     def __init__(self, regNo):
+        """
+        The Fetch class is used to get details about the students
+        which will be useful for confirming their leave just by 
+        inputting their registration number.
+        """
+
         self.regNo = regNo
         self.curTime = datetime.datetime.now()
         self.client = MongoClient(f"mongodb+srv://{dbUsr}:{dbPwd}@cluster0.w25vf.mongodb.net/?retryWrites=true&w=majority").leavePass.approved
-        self.data = client.find_one({"regNo": regNo})
-    
-    def out(self):
-        return self.data
+        self.data = self.client.find_one({"regNo": regNo})
     
     def isScanned(self):
+        """
+        The isScanned method outputs a boolen, it will return
+        True if the student already scanned the RFID reader and 
+        now he/she is scanning again to confirm that they 
+        returned, and it will return False if the student
+        didn't left the campus yet.
+        """
+
         try:
             self.data["lastScanned"]
             return True
@@ -27,6 +37,10 @@ class Fetch:
             return False
 
     def update(self):
+        """
+        The update method is used to update the current
+        time when the student first scans the RFID reader.
+        """
 
         updateString = {
             "$set": {
@@ -37,53 +51,15 @@ class Fetch:
         self.client.update_one({"regNo": self.regNo}, updateString)
     
     def isLate(self):
-        returnDate = self.data["toDate"]
-        curDate = self.curtime
-
-        return retrunDate < curDate
+        """
+        The isLate method returns a boolean, it will 
+        return True if the student reported to the 
+        university late, and it will return False
+        if the student reported to the university 
+        on time.
+        """
         
+        returnDate = self.data["toDate"]
+        curDate = self.curTime
 
-
-approvedDB = Fetch("22BEC7194")
-
-print(approvedDB.isScanned())
-
-
-def rfidData(temp):
-    if temp == 1:
-        return "22BEC7193"
-    
-    elif temp == 2:
-        return "21BCE7194"
-    
-    else:
-        return "19BCE1234"
-
-def daysLeft(dateStr):
-    curDate = datetime.datetime.now()
-    #dateStrObj = datetime.datetime.strptime(dateStr, "%Y-%m-%d %H:%M:%S")
-    leftDays = dateStr - curDate
-
-    return leftDays
-
-def isLate(regNo, collection):
-    scn = collection.find_one({"regNo": regNo})
-    retrunDate = scn["toDate"]
-    curDate = datetime.datetime.now()
-
-    return retrunDate < curDate
-    if delDate.days >= 0:
-        return False
-
-    elif delDate.days < 0:
-        return True
-
-# data = rfidData(2)
-# document = approvedCollection.find_one({"regNo": data})
-
-# dbData = isScanned(approvedCollection ,data)
-# if dbData:
-#     print(f"Welcome Home {data} \nyou were on leave for: {daysLeft(dbData['lastScanned'])} days\nAre you late?: {isLate(data, approvedCollection)}")
-
-# else:
-#     print("Happy Journey")
+        return returnDate < curDate
