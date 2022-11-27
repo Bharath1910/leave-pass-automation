@@ -1,11 +1,17 @@
 from dotenv import  load_dotenv, find_dotenv 
 from pymongo import MongoClient
+import RPi.GPIO as gpio
 import os, datetime
+
+gpio.setmode(gpio.BOARD)
+gpio.setup(8, gpio.IN)
 
 # Loading the environment variables
 load_dotenv(find_dotenv())
 dbUsr = os.environ.get("MONGODB_USR")
 dbPwd = os.environ.get("MONGODB_PWD")
+
+client = MongoClient(f"mongodb+srv://{dbUsr}:{dbPwd}@cluster0.w25vf.mongodb.net/?retryWrites=true&w=majority").leavePass.approved
 
 class Fetch:
     def __init__(self, regNo):
@@ -17,8 +23,7 @@ class Fetch:
 
         self.regNo = regNo
         self.curTime = datetime.datetime.now()
-        self.client = MongoClient(f"mongodb+srv://{dbUsr}:{dbPwd}@cluster0.w25vf.mongodb.net/?retryWrites=true&w=majority").leavePass.approved
-        self.data = self.client.find_one({"regNo": regNo})
+        self.data = client.find_one({"regNo": regNo})
     
     def isScanned(self):
         """
@@ -44,7 +49,7 @@ class Fetch:
 
         updateString = {
             "$set": {
-                "lastScanned": curTime
+                "lastScanned": self.curTime
             }
         }
 
@@ -63,3 +68,22 @@ class Fetch:
         curDate = self.curTime
 
         return returnDate < curDate
+
+print("starting")
+while True:
+    try:
+        if gpio.input(8):
+            data = Fetch("22BEC7194")
+            
+            if data.isScanned():
+                print("Welcome back :)")
+                print("You are late: ", data.isLate())
+                
+            else:
+                print("updating..")
+                data.update()
+                print("Happy journey!")
+
+    except KeyboardInterrupt:
+        print("Terminating")
+        break
