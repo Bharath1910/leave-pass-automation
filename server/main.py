@@ -30,7 +30,7 @@ def isScanned(collection, regNo):
 
 def rfidData(temp):
     if temp == 1:
-        return "22BEC7194"
+        return "22BEC7193"
     
     elif temp == 2:
         return "21BCE7194"
