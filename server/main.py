@@ -1,10 +1,12 @@
 from dotenv import  load_dotenv, find_dotenv 
+from mfrc522 import SimpleMFRC522
 from pymongo import MongoClient
 import RPi.GPIO as gpio
 import os, datetime
 
 gpio.setmode(gpio.BOARD)
 gpio.setup(8, gpio.IN)
+reader = SimpleMFRC522()
 
 # Loading the environment variables
 load_dotenv(find_dotenv())
@@ -14,17 +16,17 @@ dbPwd = os.environ.get("MONGODB_PWD")
 client = MongoClient(f"mongodb+srv://{dbUsr}:{dbPwd}@cluster0.w25vf.mongodb.net/?retryWrites=true&w=majority").leavePass.approved
 
 class Fetch:
-    def __init__(self, regNo):
+    def __init__(self, tagID):
         """
         The Fetch class is used to get details about the students
         which will be useful for confirming their leave just by 
         inputting their registration number.
         """
 
-        self.regNo = regNo
+        self.tagID = tagID
         self.curTime = datetime.datetime.now()
-        self.data = client.find_one({"regNo": regNo})
-    
+        self.data = client.find_one({"tagID": self.tagID})
+
     def isScanned(self):
         """
         The isScanned method outputs a boolen, it will return
