@@ -26,6 +26,7 @@ class Fetch:
         self.tagID = tagID
         self.curTime = datetime.datetime.now()
         self.data = client.find_one({"tagID": self.tagID})
+        self.regNo = self.data["regNo"]
 
     def isScanned(self):
         """
@@ -55,7 +56,7 @@ class Fetch:
             }
         }
 
-        self.client.update_one({"regNo": self.regNo}, updateString)
+        client.update_one({"regNo": self.regNo}, updateString)
     
     def isLate(self):
         """
@@ -74,7 +75,22 @@ class Fetch:
 print("starting")
 while True:
     try:
-        tagID, _ = reader.read()
+        try:
+            tagID, _ = reader.read()
+            data = Fetch(tagID)
+        
+        except TypeError:
+            print("You are not allowed to go!")
+        
+        else:
+            if data.isScanned():
+                print("Welcome back :)")
+                print("You are late: ", data.isLate())
+                
+            else:
+                print("updating..")
+                data.update()
+                print("Happy journey!")
     
     except KeyboardInterrupt:
         print("terminating")
