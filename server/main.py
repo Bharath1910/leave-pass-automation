@@ -1,8 +1,8 @@
 from dotenv import  load_dotenv, find_dotenv 
 from mfrc522 import SimpleMFRC522
 from pymongo import MongoClient
+import os, datetime, time
 import RPi.GPIO as gpio
-import os, datetime
 
 gpio.setmode(gpio.BOARD)
 gpio.setup(8, gpio.IN)
@@ -91,7 +91,10 @@ while True:
                 print("updating..")
                 data.update()
                 print("Happy journey!")
+        time.sleep(1)
     
     except KeyboardInterrupt:
-        print("terminating")
+        print("\nterminating")
         break
+
+gpio.cleanup()
