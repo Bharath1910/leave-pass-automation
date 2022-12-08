@@ -74,18 +74,8 @@ class Fetch:
 print("starting")
 while True:
     try:
-        if gpio.input(8):
-            data = Fetch("22BEC7194")
-            
-            if data.isScanned():
-                print("Welcome back :)")
-                print("You are late: ", data.isLate())
-                
-            else:
-                print("updating..")
-                data.update()
-                print("Happy journey!")
-
+        tagID, _ = reader.read()
+    
     except KeyboardInterrupt:
-        print("Terminating")
+        print("terminating")
         break
