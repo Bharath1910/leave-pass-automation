@@ -1,2 +1,4 @@
 pymongo[srv]
 python-dotenv
+spidev
+mfrc522
