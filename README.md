@@ -1,39 +1,33 @@
-# Leave Pass Automation
+# RFID Leave Form
 
-The automated leave form aims to solve the manual and tideous work of taking the leave form and getting approval from security guards 2 times. It can be achieved by RFID tags which is provided in the student's identity cards.
+RFID leave form aims to solve the problem of  taking leave for holidays and outings by digitalizing the process using a mobile app and RFID reader in the hostel and main gate.
 
-# The database structure
+## The problem
+Right now we have these following steps to take leave and to get out of the campus.
 
-### Student's Database
-|S.No|Registration Number|Is Decrypt|Last Scanned|Mentor Registration Number|
-|--|--|--|--|--|
-|1|22BEC7194|1|20/11/2022|20ABC7194|
-|2|&#@!#$shad|0|-|20XYZ4917|
-|3|$@ASD!JN#|0|-|20MNO1234|
+1. Email your mentor for approval of leave
+2. Show the mentor's approval to your warden in your hostel
+3. Fill up the leave form and get sign from your warden.
+4. Fill up your details in a logbook in your hostel
+5. Get a remark in your leave form from the security in the hostel
+6. Again fill up your details in a logbook in the campus's main gate
+7. Get a remark in your leave form from the security in the main gate
 
-### Mentor's Database
-|S.No|Mentor Registration Number|Public Key|Private Key|
-|--|--|--|--|
-|1|20ABC7194|&#@!#$leaf|##@!#$sprd|
-|2|20XYZ4917|$@ASD!he2|ser@AD!JN#|
-|3|20MNO1234|I$^%DS|SA@D@^#|
+## The solution
+Our project is here to skip most of the above steps and give a more productive workflow, the steps you need to take here is,
 
-
-# Working
-
-![image](./images/VTAPP.png)
-![detailed](./images/schema_bg.png)
-
-# Intended Use
-1. Student requests for leave
-2. Mentor approves the leave by decrypting the student's registration number in the **Student's Database** using his private key. 
-	1. The process of decrypting is done automatically by the given app, and the faculty has to do nothing except to approve the leave for a specific registration number.
-
-3. Now when the student scans the ID, the decrypted registration number matches with the scanned registration number, and now the gadget will show green light as approved, and stores the date of scanning.
-4. When the student returns and scans the ID again, the current date is checked with the last scanned date in the database to ensure that the student didn't took any extra leave, if the program finds the student took extra leave, fine will be added accordingly.
+1. Fill out leave form using our mobile app
+2. When leaving the hostel, scan your ID card in the RFID reader.
+	1. The reader will show green light if your mentor approved your leave
+	2. The reader will show red light if your mentor rejected your leave
+	3. (Your leave form approval status will be shown in our app as well)
+3. When leaving the main gate, scan your ID card in the RFID reader.
+	1. This will follow a similar process as the step 2
 
 
-# Hardware
+As you can see, this increases the workflow of moving students out of campus, it will be very productive especially during festival seasons where many people want to move out. And with the current system, it is very inneficient and time consuming to complete all the work.
 
-1. Raspberry Pi powered by PoE
-2. RFID module
+
+## Flow Chart
+
+![Flow Chart](./images/flowchart.png)
