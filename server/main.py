@@ -4,9 +4,17 @@ from pymongo import MongoClient
 import os, datetime, time
 import RPi.GPIO as gpio
 
+# Board setup
 gpio.setmode(gpio.BOARD)
 gpio.setup(8, gpio.IN)
 reader = SimpleMFRC522()
+
+# LED setup
+statusLED = 40
+approvedLED = 36
+rejectedLED = 38
+
+gpio.setup([statusLED, approvedLED, rejectedLED], gpio.OUT)
 
 # Loading the environment variables
 load_dotenv(find_dotenv())
@@ -72,6 +80,7 @@ class Fetch:
 
         return returnDate < curDate
 
+gpio.output(statusLED, gpio.HIGH)
 print("starting")
 while True:
     try:
@@ -80,14 +89,26 @@ while True:
             data = Fetch(tagID)
         
         except TypeError:
+            gpio.output(rejectedLED, gpio.HIGH)
+            time.sleep(0.5)
+            gpio.output(rejectedLED, gpio.LOW)
+
             print("You are not allowed to go!")
         
         else:
             if data.isScanned():
+                gpio.output(approvedLED, gpio.HIGH)
+                time.sleep(0.5)
+                gpio.output(approvedLED, gpio.LOW)
+
                 print("Welcome back :)")
                 print("You are late: ", data.isLate())
                 
             else:
+                gpio.output(approvedLED, gpio.HIGH)
+                time.sleep(0.5)
+                gpio.output(approvedLED, gpio.LOW)
+                
                 print("updating..")
                 data.update()
                 print("Happy journey!")
@@ -95,6 +116,7 @@ while True:
     
     except KeyboardInterrupt:
         print("\nterminating")
+        gpio.output(statusLED, gpio.LOW)
         break
 
 gpio.cleanup()
