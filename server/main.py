@@ -80,6 +80,11 @@ class Fetch:
 
         return returnDate < curDate
 
+def blink(led):
+    gpio.output(led, gpio.HIGH)
+    time.sleep(0.5)
+    gpio.output(led, gpio.LOW)
+
 gpio.output(statusLED, gpio.HIGH)
 print("starting")
 while True:
@@ -89,26 +94,18 @@ while True:
             data = Fetch(tagID)
         
         except TypeError:
-            gpio.output(rejectedLED, gpio.HIGH)
-            time.sleep(0.5)
-            gpio.output(rejectedLED, gpio.LOW)
-
+            blink(rejectedLED)
             print("You are not allowed to go!")
         
         else:
             if data.isScanned():
-                gpio.output(approvedLED, gpio.HIGH)
-                time.sleep(0.5)
-                gpio.output(approvedLED, gpio.LOW)
-
+                blink(approvedLED)
                 print("Welcome back :)")
                 print("You are late: ", data.isLate())
                 
             else:
-                gpio.output(approvedLED, gpio.HIGH)
-                time.sleep(0.5)
-                gpio.output(approvedLED, gpio.LOW)
-                
+                blink(approvedLED)
+
                 print("updating..")
                 data.update()
                 print("Happy journey!")
